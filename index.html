@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EXECUTIVE WEALTH TERMINAL // ADREAN W. J.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-main: #060913;
+            --card-bg: rgba(15, 23, 42, 0.72);
+            --border-subtle: rgba(148, 163, 184, 0.14);
+        }
+        body {
+            background-color: var(--bg-main);
+            color: #f1f5f9;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(14, 165, 233, 0.12) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(16, 185, 129, 0.08) 0px, transparent 50%);
+            background-attachment: fixed;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .font-display { font-family: 'Space Grotesk', sans-serif; }
+        .font-mono-num { font-family: 'JetBrains Mono', monospace; }
+        
+        .glass-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-subtle);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+        }
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.35);
+        }
+        
+        /* Fluid Animations */
+        .fade-slide-enter {
+            animation: fadeSlideIn 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+        @keyframes fadeSlideIn {
+            0% { opacity: 0; transform: translateY(10px) scale(0.99); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .bar-fill {
+            transition: width 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+        
+        /* Custom Scrollbar for Tabs */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .tab-btn {
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(16, 185, 129, 0.2));
+            border-color: #38bdf8;
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(56, 189, 248, 0.2);
+        }
+    </style>
+</head>
+<body class="p-3 sm:p-6 md:p-8 min-h-screen pb-16">
+    <div class="max-w-5xl mx-auto space-y-5">
+
+        <!-- HEADER & MONTHLY TIME-MACHINE TABS -->
+        <header class="glass-card p-4 sm:p-6 rounded-2xl">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-slate-800/80 pb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="text-[11px] font-mono-num uppercase tracking-widest text-sky-400">WEALTH MANAGEMENT TERMINAL</span>
+                    </div>
+                    <h1 class="text-xl sm:text-2xl font-display font-bold text-white tracking-tight mt-0.5">Executive Portfolio Dashboard</h1>
+                    <p class="text-xs text-slate-400">Target Horizon: <span class="text-emerald-400 font-medium">Financial Freedom Usia 28</span></p>
+                </div>
+
+                <!-- Interactive Month Selector -->
+                <div class="flex flex-col items-start md:items-end gap-1.5">
+                    <span class="text-[10px] uppercase tracking-wider text-slate-400 font-semibold">Pilih Periode Laporan (Log Bulanan)</span>
+                    <div id="month-tabs" class="flex items-center gap-2 overflow-x-auto no-scrollbar w-full md:w-auto py-0.5">
+                        <!-- Rendered via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- HERO NET WORTH BANNER -->
+            <div id="hero-container" class="pt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 fade-slide-enter">
+                <!-- Net Worth -->
+                <div class="bg-slate-900/80 p-4 rounded-xl border border-emerald-500/30 flex flex-col justify-between">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400 font-medium">Kekayaan Bersih (Net Worth)</span>
+                        <span id="nw-badge" class="text-[10px] font-mono-num px-2 py-0.5 bg-emerald-500/15 text-emerald-300 rounded-full font-semibold">+45.8% Net MoM</span>
+                    </div>
+                    <div id="val-networth" class="text-2xl sm:text-3xl font-mono-num font-bold text-emerald-400 my-1">Rp 3.666.483</div>
+                    <div id="sub-networth" class="text-[11px] text-slate-400">Aset Bersih setelah dikurangi kewajiban</div>
+                </div>
+
+                <!-- Total Gross Assets -->
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 flex flex-col justify-between">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400 font-medium">Total Aset Kotor</span>
+                        <span id="asset-badge" class="text-[10px] font-mono-num px-2 py-0.5 bg-sky-500/15 text-sky-300 rounded-full font-semibold">100% Pertahanan</span>
+                    </div>
+                    <div id="val-assets" class="text-xl sm:text-2xl font-mono-num font-bold text-white my-1">Rp 6.427.549</div>
+                    <div id="sub-assets" class="text-[11px] text-slate-400">4 Instrumen Aktif</div>
+                </div>
+
+                <!-- Total Liabilities (Clean Label) -->
+                <div class="bg-slate-900/60 p-4 rounded-xl border border-rose-500/25 flex flex-col justify-between">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs text-slate-400 font-medium">Total Kewajiban (Hutang)</span>
+                        <span id="debt-ratio-badge" class="text-[10px] font-mono-num px-2 py-0.5 bg-rose-500/15 text-rose-300 rounded-full font-semibold">Rasio 42.9%</span>
+                    </div>
+                    <div id="val-debt" class="text-xl sm:text-2xl font-mono-num font-bold text-rose-400 my-1">Rp 2.761.066</div>
+                    <div id="sub-debt" class="text-[11px] text-slate-400">Terjadwal lunas dalam 3 periode</div>
+                </div>
+            </div>
+        </header>
+
+        <!-- FINANCIAL LADDER PROGRESS -->
+        <section class="glass-card p-4 sm:p-6 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center">
+                <h2 class="text-sm sm:text-base font-display font-bold text-white tracking-wide flex items-center gap-2">
+                    <span class="h-4 w-1 bg-sky-400 rounded-full"></span>
+                    Indikator Tangga Finansial
+                </h2>
+                <span id="period-label" class="text-xs font-mono-num text-slate-400">Oktober 2026</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+                <!-- Step 1 -->
+                <div class="bg-slate-900/55 p-3.5 rounded-xl border border-slate-800/90">
+                    <div class="flex justify-between items-center text-xs mb-2">
+                        <span class="font-semibold text-sky-400">Tahap 1 • Tabungan 10 Juta</span>
+                        <span id="step1-pct" class="font-mono-num font-bold text-white">64.3%</span>
+                    </div>
+                    <div class="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden">
+                        <div id="step1-bar" class="bar-fill bg-gradient-to-r from-sky-500 to-emerald-400 h-full rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="step1-desc" class="text-[11px] text-slate-400 mt-2">Terkumpul Rp 6.427.549 • Sisa Rp 3.572.451</p>
+                </div>
+
+                <!-- Step 2 -->
+                <div class="bg-slate-900/55 p-3.5 rounded-xl border border-slate-800/90">
+                    <div class="flex justify-between items-center text-xs mb-2">
+                        <span class="font-semibold text-rose-400">Tahap 2 • Eliminasi Hutang</span>
+                        <span id="step2-pct" class="font-mono-num font-bold text-rose-300">Rp 2.76 Jt</span>
+                    </div>
+                    <div class="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden">
+                        <div id="step2-bar" class="bar-fill bg-gradient-to-r from-rose-500 to-amber-400 h-full rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="step2-desc" class="text-[11px] text-slate-400 mt-2">Rasio terhadap aset: 42.96% (Terkendali)</p>
+                </div>
+
+                <!-- Step 3 -->
+                <div class="bg-slate-900/55 p-3.5 rounded-xl border border-slate-800/90">
+                    <div class="flex justify-between items-center text-xs mb-2">
+                        <span class="font-semibold text-emerald-400">Tahap 3 • Dana Darurat (15 Jt)</span>
+                        <span id="step3-pct" class="font-mono-num font-bold text-white">42.9%</span>
+                    </div>
+                    <div class="w-full bg-slate-800/80 h-2 rounded-full overflow-hidden">
+                        <div id="step3-bar" class="bar-fill bg-emerald-500 h-full rounded-full" style="width: 0%"></div>
+                    </div>
+                    <p id="step3-desc" class="text-[11px] text-slate-400 mt-2">Patokan Rp 5 Jt/bln (Min 3 Bulan)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAIN DUAL VIEW: ASSETS & LIABILITIES -->
+        <div id="main-content-grid" class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 fade-slide-enter">
+            
+            <!-- LEFT: ASSET ALLOCATION (7 Cols) -->
+            <div class="lg:col-span-7 glass-card p-4 sm:p-6 rounded-2xl flex flex-col justify-between space-y-4">
+                <div>
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-display font-bold text-white">Komposisi Aset Portofolio</h3>
+                            <p class="text-[11px] text-slate-400">Distribusi likuiditas & instrumen investasi aktif</p>
+                        </div>
+                        <span id="asset-count-pill" class="text-xs font-mono-num px-2.5 py-1 bg-slate-800 text-sky-300 rounded-lg">4 Pos Aset</span>
+                    </div>
+
+                    <!-- Stacked Allocation Bar -->
+                    <div class="mt-4">
+                        <div id="allocation-bar" class="w-full h-3 bg-slate-800 rounded-full overflow-hidden flex gap-0.5"></div>
+                        <div id="allocation-legend" class="flex flex-wrap gap-3 mt-2 text-[11px] text-slate-400"></div>
+                    </div>
+
+                    <!-- Asset Items List -->
+                    <div id="asset-list" class="mt-4 space-y-2.5"></div>
+                </div>
+
+                <!-- Historical Comparison Mini-Bar -->
+                <div class="pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                    <span>Pertumbuhan Aset vs Bulan Lalu:</span>
+                    <span id="mom-growth-text" class="font-mono-num font-bold text-emerald-400">+Rp 3.912.973 (+155.6%)</span>
+                </div>
+            </div>
+
+            <!-- RIGHT: LIABILITY SCHEDULE & STRATEGY SIMULATOR (5 Cols) -->
+            <div class="lg:col-span-5 flex flex-col justify-between gap-4 sm:gap-5">
+                
+                <!-- Clean Liability Schedule -->
+                <div class="glass-card p-4 sm:p-6 rounded-2xl space-y-3.5">
+                    <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                        <div>
+                            <h3 class="text-sm sm:text-base font-display font-bold text-white">Jadwal Kewajiban Berjalan</h3>
+                            <p class="text-[11px] text-slate-400">Rincian jatuh tempo berdasarkan periode</p>
+                        </div>
+                        <span id="debt-total-pill" class="text-xs font-mono-num px-2.5 py-1 bg-rose-500/15 text-rose-300 border border-rose-500/30 rounded-lg font-bold">Rp 2.761.066</span>
+                    </div>
+
+                    <div id="debt-list" class="space-y-2.5"></div>
+                </div>
+
+                <!-- Interactive Tactical Simulator -->
+                <div class="glass-card p-4 sm:p-5 rounded-2xl border border-sky-500/30 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs font-display font-bold uppercase tracking-wider text-sky-400">Simulasi Manuver 02 Nov</span>
+                        <span class="text-[10px] px-2 py-0.5 bg-sky-500/15 text-sky-300 rounded font-medium">Interaktif</span>
+                    </div>
+                    <p id="sim-intro" class="text-xs text-slate-300 leading-relaxed">
+                        Klik skenario di bawah untuk melihat proyeksi posisi kas saat <strong>Deposito (Rp 2.073.927)</strong> cair:
+                    </p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="setScenario('A')" id="btn-scen-A" class="text-xs py-2 px-3 rounded-lg border border-sky-500 bg-sky-500/20 text-white font-semibold transition">
+                            Opsi A: Gulung ke RDPU
+                        </button>
+                        <button onclick="setScenario('B')" id="btn-scen-B" class="text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-900/60 text-slate-300 font-semibold transition">
+                            Opsi B: Potong Kewajiban
+                        </button>
+                    </div>
+                    <div id="scenario-output" class="p-3 bg-slate-950/80 rounded-xl border border-slate-800 text-xs space-y-1.5"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <footer class="text-center text-[11px] text-slate-500 pt-2 font-mono-num">
+            EXECUTIVE WEALTH TERMINAL v3.0 // MULTI-MONTH INTERACTIVE LOG
+        </footer>
+    </div>
+
+    <script>
+        const monthlyData = {
+            "2026-09": {
+                id: "2026-09",
+                label: "Sep 2026",
+                fullName: "September 2026 (Inisiasi)",
+                grossAssets: 2514576,
+                totalDebt: 0,
+                netWorth: 2514576,
+                nwBadge: "Inisiasi Awal",
+                assetBadge: "81.5% Pertahanan",
+                debtBadge: "Belum Tercatat",
+                subNetworth: "Basis modal uang dingin pertama",
+                subAssets: "2 Instrumen Aktif (Emas & FOMO)",
+                subDebt: "Data kewajiban belum diinput pada periode ini",
+                momText: "Periode Dasar (Baseline Log)",
+                step1Pct: 25.1,
+                step1Desc: "Terkumpul Rp 2.514.576 • Sisa Rp 7.485.424",
+                step2PctText: "Belum Diinput",
+                step2BarWidth: 0,
+                step2Desc: "Audit kewajiban baru dimulai pada Oktober 2026",
+                step3Pct: 16.8,
+                step3Desc: "16.8% dari target minimum Rp 15 Juta",
+                assets: [
+                    {
+                        name: "Emas Digital (Bank Jago)",
+                        tag: "Safe Haven",
+                        tagColor: "amber",
+                        amount: 2049576,
+                        pct: 81.51,
+                        barColor: "bg-amber-400",
+                        note: "Pembelian 0,817218 gr @ Rp 2.507.990/gr (13 Sep 2026)"
+                    },
+                    {
+                        name: "On-Chain Trading (FOMO)",
+                        tag: "High-Risk Alpha",
+                        tagColor: "purple",
+                        amount: 465000,
+                        pct: 18.49,
+                        barColor: "bg-purple-500",
+                        note: "Valuasi $30 USD (Modal $20 USD, ROI +50%)"
+                    }
+                ],
+                debts: []
+            },
+            "2026-10": {
+                id: "2026-10",
+                label: "Okt 2026",
+                fullName: "Oktober 2026 (Berjalan)",
+                grossAssets: 6427549,
+                totalDebt: 2761066,
+                netWorth: 3666483,
+                nwBadge: "+45.8% Net MoM",
+                assetBadge: "100% Pertahanan",
+                debtBadge: "Rasio 42.9%",
+                subNetworth: "Surplus likuiditas 2,33x lipat di atas kewajiban",
+                subAssets: "4 Pos Pertahanan Aktif (FOMO Ditutup)",
+                subDebt: "Terjadwal selesai dalam 3 periode (Nov - Jan)",
+                momText: "+Rp 3.912.973 (+155.6% vs Sep 2026)",
+                step1Pct: 64.3,
+                step1Desc: "Terkumpul Rp 6.427.549 • Sisa Rp 3.572.451",
+                step2PctText: "Rp 2.76 Jt",
+                step2BarWidth: 43,
+                step2Desc: "Rasio kewajiban terhadap aset: 42.96% (Sehat)",
+                step3Pct: 42.9,
+                step3Desc: "42.9% dari target minimum Rp 15 Juta",
+                assets: [
+                    {
+                        name: "Emas Digital (Bank Jago)",
+                        tag: "Lindung Nilai",
+                        tagColor: "amber",
+                        amount: 2327434,
+                        pct: 36.21,
+                        barColor: "bg-amber-400",
+                        note: "Jangkar inflasi Tahap 1 • Koreksi wajar -6.51% (Spread)"
+                    },
+                    {
+                        name: "Deposito Berjangka (Bank Jago)",
+                        tag: "Cair 02 Nov",
+                        tagColor: "sky",
+                        amount: 2073927,
+                        pct: 32.27,
+                        barColor: "bg-sky-400",
+                        note: "Jatuh tempo 02 Nov 2026 • Siap direlokasi ke RDPU"
+                    },
+                    {
+                        name: "RDPU Konservatif (Bibit)",
+                        tag: "Likuiditas Inti",
+                        tagColor: "emerald",
+                        amount: 2000000,
+                        pct: 31.12,
+                        barColor: "bg-emerald-400",
+                        note: "Portofolio 'Isi Bulanan' • Pajak 0% & Pencairan Instan"
+                    },
+                    {
+                        name: "Kantong Utama (Bank Jago)",
+                        tag: "Kas Operasional",
+                        tagColor: "slate",
+                        amount: 26188,
+                        pct: 0.41,
+                        barColor: "bg-slate-400",
+                        note: "Saldo kas bebas siaga"
+                    }
+                ],
+                debts: [
+                    {
+                        period: "Periode November 2026",
+                        badge: "Prioritas 1 (57.1%)",
+                        amount: 1575423,
+                        color: "rose",
+                        desc: "Gelombang terbesar. Setelah lunas, beban turun drastis."
+                    },
+                    {
+                        period: "Periode Desember 2026",
+                        badge: "Prioritas 2 (38.2%)",
+                        amount: 1056146,
+                        color: "amber",
+                        desc: "Gelombang menengah. Menyisakan <5% kewajiban."
+                    },
+                    {
+                        period: "Periode Januari 2027",
+                        badge: "Penyelesaian (4.7%)",
+                        amount: 129497,
+                        color: "emerald",
+                        desc: "Ekor kewajiban terakhir menuju 100% bebas hutang."
+                    }
+                ]
+            }
+        };
+
+        let currentMonth = "2026-10";
+
+        function formatIDR(num) {
+            return "Rp " + num.toLocaleString("id-ID");
+        }
+
+        function renderTabs() {
+            const container = document.getElementById("month-tabs");
+            container.innerHTML = "";
+            Object.values(monthlyData).forEach(m => {
+                const activeClass = m.id === currentMonth 
+                    ? "tab-active" 
+                    : "bg-slate-900/70 border-slate-800 text-slate-400 hover:text-white hover:border-slate-700";
+                const btn = document.createElement("button");
+                btn.className = `tab-btn text-xs font-mono-num font-semibold px-3.5 py-2 rounded-xl border whitespace-nowrap ${activeClass}`;
+                btn.innerText = m.label;
+                btn.onclick = () => switchMonth(m.id);
+                container.appendChild(btn);
+            });
+
+            const nextBtn = document.createElement("div");
+            nextBtn.className = "text-[11px] font-mono-num px-3 py-2 rounded-xl border border-dashed border-slate-800 text-slate-600 whitespace-nowrap select-none";
+            nextBtn.innerText = "+ Nov 2026 (Soon)";
+            container.appendChild(nextBtn);
+        }
+
+        function switchMonth(monthId) {
+            currentMonth = monthId;
+            renderTabs();
+            const d = monthlyData[monthId];
+
+            const hero = document.getElementById("hero-container");
+            const mainGrid = document.getElementById("main-content-grid");
+            hero.classList.remove("fade-slide-enter");
+            mainGrid.classList.remove("fade-slide-enter");
+            void hero.offsetWidth;
+            hero.classList.add("fade-slide-enter");
+            mainGrid.classList.add("fade-slide-enter");
+
+            document.getElementById("val-networth").innerText = formatIDR(d.netWorth);
+            document.getElementById("val-assets").innerText = formatIDR(d.grossAssets);
+            document.getElementById("val-debt").innerText = formatIDR(d.totalDebt);
+            document.getElementById("nw-badge").innerText = d.nwBadge;
+            document.getElementById("asset-badge").innerText = d.assetBadge;
+            document.getElementById("debt-ratio-badge").innerText = d.debtBadge;
+            document.getElementById("sub-networth").innerText = d.subNetworth;
+            document.getElementById("sub-assets").innerText = d.subAssets;
+            document.getElementById("sub-debt").innerText = d.subDebt;
+            document.getElementById("period-label").innerText = d.fullName;
+            document.getElementById("mom-growth-text").innerText = d.momText;
+
+            document.getElementById("step1-pct").innerText = d.step1Pct + "%";
+            document.getElementById("step1-bar").style.width = d.step1Pct + "%";
+            document.getElementById("step1-desc").innerText = d.step1Desc;
+
+            document.getElementById("step2-pct").innerText = d.step2PctText;
+            document.getElementById("step2-bar").style.width = d.step2BarWidth + "%";
+            document.getElementById("step2-desc").innerText = d.step2Desc;
+
+            document.getElementById("step3-pct").innerText = d.step3Pct + "%";
+            document.getElementById("step3-bar").style.width = d.step3Pct + "%";
+            document.getElementById("step3-desc").innerText = d.step3Desc;
+
+            const allocBar = document.getElementById("allocation-bar");
+            const allocLegend = document.getElementById("allocation-legend");
+            const assetList = document.getElementById("asset-list");
+            allocBar.innerHTML = "";
+            allocLegend.innerHTML = "";
+            assetList.innerHTML = "";
+            document.getElementById("asset-count-pill").innerText = d.assets.length + " Pos Aset";
+
+            d.assets.forEach(a => {
+                const seg = document.createElement("div");
+                seg.className = `${a.barColor} h-full bar-fill`;
+                seg.style.width = a.pct + "%";
+                allocBar.appendChild(seg);
+
+                const leg = document.createElement("div");
+                leg.className = "flex items-center gap-1.5";
+                leg.innerHTML = `<span class="h-2 w-2 rounded-full ${a.barColor}"></span><span>${a.name.split(' (')[0]} (${a.pct.toFixed(1)}%)</span>`;
+                allocLegend.appendChild(leg);
+
+                const item = document.createElement("div");
+                item.className = "p-3.5 bg-slate-900/65 rounded-xl border border-slate-800/90 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 hover:border-slate-700 transition";
+                item.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-[10px] font-semibold px-2 py-0.5 bg-slate-800 text-slate-300 rounded">${a.tag}</span>
+                            <span class="text-xs font-mono-num text-slate-400">${a.pct.toFixed(2)}% porsi</span>
+                        </div>
+                        <h4 class="text-sm sm:text-base font-bold text-white mt-1">${a.name}</h4>
+                        <p class="text-[11px] text-slate-400">${a.note}</p>
+                    </div>
+                    <div class="sm:text-right border-t sm:border-t-0 border-slate-800/80 pt-2 sm:pt-0 flex sm:block justify-between items-center">
+                        <span class="text-xs text-slate-400 sm:hidden">Nilai:</span>
+                        <span class="text-base sm:text-lg font-mono-num font-bold text-white">${formatIDR(a.amount)}</span>
+                    </div>
+                `;
+                assetList.appendChild(item);
+            });
+
+            const debtList = document.getElementById("debt-list");
+            document.getElementById("debt-total-pill").innerText = formatIDR(d.totalDebt);
+            debtList.innerHTML = "";
+
+            if (d.debts.length === 0) {
+                debtList.innerHTML = `
+                    <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-800 text-center text-xs text-slate-400">
+                        Belum ada rincian kewajiban yang tercatat pada log bulan September 2026.
+                    </div>
+                `;
+            } else {
+                const borderColors = {
+                    rose: "border-l-rose-500 text-rose-400",
+                    amber: "border-l-amber-500 text-amber-400",
+                    emerald: "border-l-emerald-500 text-emerald-400"
+                };
+                d.debts.forEach(debt => {
+                    const row = document.createElement("div");
+                    row.className = `p-3.5 bg-slate-900/70 rounded-xl border border-slate-800 border-l-4 ${borderColors[debt.color].split(' ')[0]} flex justify-between items-center`;
+                    row.innerHTML = `
+                        <div>
+                            <span class="text-[10px] font-mono-num uppercase text-slate-400">${debt.badge}</span>
+                            <h4 class="text-sm font-bold text-white mt-0.5">${debt.period}</h4>
+                            <p class="text-[11px] text-slate-400 mt-0.5">${debt.desc}</p>
+                        </div>
+                        <div class="text-right pl-2">
+                            <span class="text-sm sm:text-base font-mono-num font-bold ${borderColors[debt.color].split(' ')[1]}">${formatIDR(debt.amount)}</span>
+                        </div>
+                    `;
+                    debtList.appendChild(row);
+                });
+            }
+        }
+
+        function setScenario(mode) {
+            const btnA = document.getElementById("btn-scen-A");
+            const btnB = document.getElementById("btn-scen-B");
+            const out = document.getElementById("scenario-output");
+
+            if (mode === 'A') {
+                btnA.className = "text-xs py-2 px-3 rounded-lg border border-sky-500 bg-sky-500/20 text-white font-semibold transition";
+                btnB.className = "text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-900/60 text-slate-300 font-semibold transition";
+                out.innerHTML = `
+                    <div class="flex justify-between text-slate-300"><span>Posisi RDPU Bibit Baru:</span><strong class="font-mono-num text-emerald-400">Rp 4.073.927</strong></div>
+                    <div class="flex justify-between text-slate-300"><span>Sumber Pelunasan Nov:</span><strong class="text-sky-300">Arus Kas Gaji Bulanan</strong></div>
+                    <p class="text-[11px] text-slate-400 pt-1 border-t border-slate-800">Aset pertahanan tetap utuh Rp 6,42 Jt dan seluruh dana deposito bebas dari potongan pajak 20%.</p>
+                `;
+            } else {
+                btnB.className = "text-xs py-2 px-3 rounded-lg border border-sky-500 bg-sky-500/20 text-white font-semibold transition";
+                btnA.className = "text-xs py-2 px-3 rounded-lg border border-slate-700 bg-slate-900/60 text-slate-300 font-semibold transition";
+                out.innerHTML = `
+                    <div class="flex justify-between text-slate-300"><span>Kewajiban Langsung Lunas:</span><strong class="font-mono-num text-emerald-400">Nov + Jan (Rp 1.704.920)</strong></div>
+                    <div class="flex justify-between text-slate-300"><span>Sisa Masuk ke RDPU Bibit:</span><strong class="font-mono-num text-sky-300">+Rp 369.007 (Total Rp 2,36 Jt)</strong></div>
+                    <p class="text-[11px] text-slate-400 pt-1 border-t border-slate-800">Menghilangkan 61,7% beban kewajiban seketika tanpa menyentuh gaji bulanan.</p>
+                `;
+            }
+        }
+
+        window.onload = () => {
+            switchMonth("2026-10");
+            setScenario("A");
+        };
+    </script>
+</body>
+</html>
